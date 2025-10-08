@@ -1,0 +1,34 @@
+# VarAnnotator/environment.yml
+
+name: variant-anno-env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  # Python
+  - python=3.10
+
+  # Python package
+  - numpy
+  - pandas
+  - cyvcf2
+  - pyarrow
+  - duckdb
+
+  # Bioinformatic
+  - bcftools
+  - samtools
+  - openjdk=17
+
+  # R script
+  - r-base
+  - r-tidyverse
+
+  # pip install packages not in conda
+  - pip
+  - pip:
+    - pydantic
+    - structlog
+    - dask[complete]

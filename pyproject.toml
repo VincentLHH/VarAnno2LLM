@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "VarAnnotator"
+version = "0.2.0"
+description = "A variant annotation tool for SNV/Indel"
+authors = [{name = "Haohan Liu", email = "liuhaohan@genomics.com"}]
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+varannot = "VarAnnotator.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["VarAnnotator*"]
+
+[tool.setuptools.package-dir]
+"" = "src"

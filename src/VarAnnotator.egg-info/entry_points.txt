@@ -1,0 +1,2 @@
+[console_scripts]
+varannot = VarAnnotator.cli:main

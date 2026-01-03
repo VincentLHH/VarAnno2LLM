@@ -13,7 +13,7 @@
 
 ---
 
-## 🔧 Core Features
+## Core Features
 
 ### 1. Preprocessing (`pre`)
 - Accepts VCF/VCF.gz or CPRA input
@@ -52,3 +52,4 @@ vep_cache/
 ├── condel/          # Condel configuration files
 ├── clinvar/         # clinvar.vcf.gz
 └── intervar/        # intervar.vcf.gz
+

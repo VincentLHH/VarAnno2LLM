@@ -53,3 +53,21 @@ vep_cache/
 ├── clinvar/         # clinvar.vcf.gz
 └── intervar/        # intervar.vcf.gz
 
+---
+
+## Quick Start
+
+You can run **VarAnno2LLM** locally in minutes:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/VarAnno2LLM.git
+cd VarAnno2LLM
+
+# 2. Install in editable mode (requires Python ≥3.8)
+pip install -e .
+
+# 3. Run any subcommand
+varannot --help
+
+

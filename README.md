@@ -52,6 +52,7 @@ vep_cache/
 ├── condel/          # Condel configuration files
 ├── clinvar/         # clinvar.vcf.gz
 └── intervar/        # intervar.vcf.gz
+```
 
 ---
 
@@ -69,5 +70,6 @@ pip install -e .
 
 # 3. Run any subcommand
 varannot --help
+```
 
 

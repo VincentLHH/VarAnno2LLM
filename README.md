@@ -5,7 +5,7 @@
 
 **VarAnno2LLM** is an end-to-end variant annotation and prompt generation pipeline designed to transform raw genomic variants (VCF or CPRA format) into LLM-friendly JSONL files for training or inference. The toolkit integrates three core functionalities:
 
-1. **Preprocessing**: QC, normalization, and aggregation of sparse CPRA/phenotype data with genotype-based filtering (e.g., remove high-frequency variants, apply whitelist).
+1. **Preprocessing**: QC, normalization, and aggregation of sparse CPRA/phenotype data.
 2. **Annotation**: Comprehensive functional annotation powered by [Ensembl VEP](https://grch37.ensembl.org/info/docs/tools/vep/index.html) with support for plugins and custom databases.
 3. **Prompt Engineering**: Conversion of annotated variants into structured JSONL records embedded with customizable prompt templates for LLMs.
 
@@ -71,6 +71,7 @@ pip install -e .
 # 3. Run any subcommand
 varannot --help
 ```
+
 
 
 

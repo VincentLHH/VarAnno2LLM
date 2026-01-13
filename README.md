@@ -9,7 +9,7 @@
 2. **Annotation**: Comprehensive functional annotation powered by [Ensembl VEP](https://grch37.ensembl.org/info/docs/tools/vep/index.html) with support for plugins and custom databases.
 3. **Prompt Engineering**: Conversion of annotated variants into structured JSONL records embedded with customizable prompt templates for LLMs.
 
-> Contact: [liuhaohan@genomics.cn](mailto:liuhaohan@genomics.cn)
+> Contact: Omitted for double-blind review
 
 ---
 
@@ -71,5 +71,6 @@ pip install -e .
 # 3. Run any subcommand
 varannot --help
 ```
+
 
 

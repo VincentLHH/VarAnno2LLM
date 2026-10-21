@@ -13,9 +13,9 @@ def cpra_to_vcf(
         sample_name: str = "SAMPLE1"
 ) -> bool:
     """
-    Construct a VCF from cpra input (one per line: CHROM-POS-REF-ALT<tab>zygosity).
+    Construct a VCF from CPRA input (CPRA, phenotype, zygosity as tab-separated fields).
 
-    Zygosity can be: Het, Hom, Hemi, or empty (treated as Het).
+    Zygosity can be: Het, Hom, Hemi, or empty (treated as Het with a warning).
     QUAL is set to 100 for all variants.
     GT is determined by zygosity:
         - Hom -> 1/1
@@ -47,8 +47,8 @@ def cpra_to_vcf(
         'Hom': '1/1',
         'Het': '0/1',
         'Hemi': '0/1',
-        '': '1/1', # default to Hom
-        '.': '1/1'
+        '': '0/1', # default to Het and warn
+        '.': '0/1'
     }
     rraw_vcf = output_vcf.with_suffix(".vcf")
     compressed_vcf = str(rraw_vcf) + ".gz"
@@ -87,6 +87,10 @@ def cpra_to_vcf(
                 if zygosity not in zygosity_to_gt:
                     logger.warning(f"Unknown zygosity '{zygosity}' at line {line_num}, treating as Het")
                     zygosity = ''
+                if not zygosity:
+                    logger.warning(
+                        f"Missing zygosity at line {line_num}; using Het for VCF conversion"
+                    )
                 try:
                     chrom, pos_str, ref, alt = cpra.replace('-', '\t').split('\t')
                     pos = int(pos_str)
@@ -184,7 +188,7 @@ def qc_vcf(
 
         if norm:
             norm_cmd = [
-                "bcftools", "norm", "-c", "s",
+                "bcftools", "norm", "-c", "s", "-m", "-any",
                 "-f", str(ref_dir),
                 "-Oz",
                 "-o", compressed_vcf

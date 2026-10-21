@@ -228,5 +228,24 @@ Menu structure：
         help="prompt label",
     )
 
+    parser_prompt.add_argument(
+        "--consequence-filter",
+        action="store_true",
+        help="keep protein-altering and splice-related consequences only",
+    )
+
+    parser_prompt.add_argument(
+        "--omim-filter",
+        action="store_true",
+        help="keep variants with a non-empty OMIM disease annotation",
+    )
+
+    parser_prompt.add_argument(
+        "--max-variant-length",
+        type=int,
+        default=None,
+        help="exclude alleles whose REF or ALT length is at least this value",
+    )
+
 
     return parser

@@ -105,6 +105,9 @@ def run_prompter(
         label = args.label,
         af_filter = args.af_filter,
         use_white_list = not args.no_whitelist,
+        consequence_filter = args.consequence_filter,
+        omim_filter = args.omim_filter,
+        max_variant_length = args.max_variant_length,
     )
     if success:
         logger.info(f"Done for prompt: {args.output}/{args.input.name}.jsonl")

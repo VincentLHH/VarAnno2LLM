@@ -1,7 +1,7 @@
 # VarAnno2LLM
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 **VarAnno2LLM** is an end-to-end variant annotation and prompt generation pipeline designed to transform raw genomic variants (VCF or CPRA format) into LLM-friendly JSONL files for training or inference. The toolkit integrates three core functionalities:
 
@@ -17,7 +17,7 @@
 
 ### 1. Preprocessing (`pre`)
 - Accepts VCF/VCF.gz or CPRA input
-- Performs quality control (QUAL/FILTER filtering) and left-alignment/normalization (via `bcftools norm`)
+- Performs quality control (QUAL/FILTER filtering), left-alignment/normalization and multiallelic splitting (via `bcftools norm`)
 - Option to skip QC for pre-cleaned data
 
 ### 2. Annotation (`anno`)
@@ -33,9 +33,13 @@
 ### 3. Prompt Generation (`prompt`)
 - Converts VEP-annotated TSV into **LLM-ready JSONL**
 - Supports:
-  - Gene whitelist filtering (for RAG or targeted analysis)
+  - Gene-list membership annotation for RAG
+  - A known-variant whitelist for allele-frequency filter exemptions
   - Phenotype integration (HPO or custom phenotypes)
   - Allele frequency filtering (AF < 0.01)
+  - Optional protein-altering/splice consequence filtering
+  - Optional OMIM-annotated-gene filtering
+  - Optional allele-length filtering
   - Label assignment (`test`, `positive`, `negative`)
 - Embeds configurable prompt templates (editable in source)
 
@@ -62,14 +66,26 @@ You can run **VarAnno2LLM** locally in minutes:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/VarAnno2LLM.git
+git clone https://github.com/VincentLHH/VarAnno2LLM.git
 cd VarAnno2LLM
 
-# 2. Install in editable mode (requires Python ≥3.8)
+# 2. Install in editable mode (requires Python ≥3.10)
 pip install -e .
 
 # 3. Run any subcommand
 varannot --help
+```
+
+VIPER-style prompt generation uses the following candidate filters:
+
+```bash
+varannot prompt annotated.tsv \
+  --gene-list gene_list.xlsx \
+  -o prompts \
+  --af-filter \
+  --consequence-filter \
+  --omim-filter \
+  --max-variant-length 1000
 ```
 
 

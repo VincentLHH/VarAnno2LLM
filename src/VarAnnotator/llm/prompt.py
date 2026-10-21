@@ -9,6 +9,62 @@ import json
 setup_logger()
 logger = logging.getLogger(__name__)
 
+CLINICALLY_RELEVANT_CONSEQUENCES = {
+    "transcript_ablation",
+    "splice_acceptor_variant",
+    "splice_donor_variant",
+    "stop_gained",
+    "frameshift_variant",
+    "stop_lost",
+    "start_lost",
+    "transcript_amplification",
+    "inframe_insertion",
+    "inframe_deletion",
+    "missense_variant",
+    "protein_altering_variant",
+    "splice_region_variant",
+}
+
+
+def passes_clinical_filters(
+        cpra: str,
+        consequence,
+        associated_diseases,
+        consequence_filter: bool = False,
+        omim_filter: bool = False,
+        max_variant_length=None,
+) -> bool:
+    """Apply optional consequence, OMIM and allele-length filters."""
+    if consequence_filter:
+        if isinstance(consequence, str):
+            terms = consequence.replace("&", ",").split(",")
+        elif isinstance(consequence, (list, tuple, set)):
+            terms = list(consequence)
+        else:
+            terms = []
+        normalized = {
+            str(term).strip().lower()
+            for term in terms
+            if str(term).strip()
+        }
+        if not normalized.intersection(CLINICALLY_RELEVANT_CONSEQUENCES):
+            return False
+
+    if omim_filter and not associated_diseases:
+        return False
+
+    if max_variant_length is not None:
+        parts = str(cpra).rsplit("-", 2)
+        if len(parts) != 3:
+            logger.warning(f"Cannot determine allele length from CPRA: {cpra}")
+            return False
+        ref, alt = parts[1], parts[2]
+        if max(len(ref), len(alt)) >= max_variant_length:
+            return False
+
+    return True
+
+
 def get_anno(
         anno: dict,
 ) -> dict:
@@ -54,13 +110,24 @@ def get_anno(
     snv_list["MutationTaster2"] = MutationTaster_map.get(MT2[0], "") if isinstance(MT2, str) and len(MT2) > 0 else ""
     snv_list["Revel"] = anno["REVEL_score"][0] if anno["REVEL_score"] else ""
     snv_list["Condel"] = anno["Condel"].split('(')[1].split(')')[0] if anno["Condel"] else ""
-    splice_scores = [
-        float(anno["SpliceAI_pred_DS_AG"] if anno["SpliceAI_pred_DS_AG"] else 0),
-        float(anno["SpliceAI_pred_DS_AL"] if anno["SpliceAI_pred_DS_AG"] else 0),
-        float(anno["SpliceAI_pred_DS_DG"] if anno["SpliceAI_pred_DS_AG"] else 0),
-        float(anno["SpliceAI_pred_DS_DL"] if anno["SpliceAI_pred_DS_AG"] else 0),
-    ]
-    splice_scores = [s for s in splice_scores if not pd.isna(s) and s >= 0]
+    splice_scores = []
+    for key in [
+        "SpliceAI_pred_DS_AG",
+        "SpliceAI_pred_DS_AL",
+        "SpliceAI_pred_DS_DG",
+        "SpliceAI_pred_DS_DL",
+    ]:
+        value = anno.get(key)
+        if isinstance(value, (list, tuple)):
+            value = value[0] if value else None
+        if value in (None, "", "-"):
+            continue
+        try:
+            score = float(value)
+        except (TypeError, ValueError):
+            continue
+        if not pd.isna(score) and score >= 0:
+            splice_scores.append(score)
     snv_list["SpliceAI"] = max(splice_scores) if splice_scores else ""
     snv_list["dbscSnv_RF"] = anno["rf_score"] if anno["rf_score"] else ""
     snv_list["dbscSnv_ADA"] = anno["ada_score"] if anno["ada_score"] else ""
@@ -398,6 +465,7 @@ def get_zyg(
         inh: list,
         zyg_ori: str,
 ) -> str:
+    """Infer an inheritance-compatible zygosity for training records."""
     zyg = zyg_ori
     if not inh:
         return zyg
@@ -427,6 +495,9 @@ def get_jsonl(
         label: str = "test",
         af_filter: bool = False,
         use_white_list: bool = True,
+        consequence_filter: bool = False,
+        omim_filter: bool = False,
+        max_variant_length=None,
 ) -> bool:
     gene_set = get_gene_set(gene_set_file)
     white_list = get_white_list(white_list_file) if white_list_file else None
@@ -446,6 +517,16 @@ def get_jsonl(
                     max_af = float(anno["max_af"]) if anno["max_af"] else 0
                     if max_af > 0.01:
                         continue
+
+                if not passes_clinical_filters(
+                    cpra=anno["cpra"],
+                    consequence=anno["functional consequences"],
+                    associated_diseases=anno["associated diseases"],
+                    consequence_filter=consequence_filter,
+                    omim_filter=omim_filter,
+                    max_variant_length=max_variant_length,
+                ):
+                    continue
 
                 if label != "test":
                     inh_list = [x.strip() for x in anno["inheritance"].split(",")] if anno["inheritance"] else []

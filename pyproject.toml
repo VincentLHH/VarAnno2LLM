@@ -9,11 +9,26 @@ description = "A variant annotation tool for SNV/Indel"
 authors = [{name = "Haohan Liu", email = "liuhaohan@genomics.com"}]
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = [
+    "cyvcf2",
+    "dask[complete]",
+    "duckdb",
+    "humanfriendly",
+    "numpy",
+    "pandas",
+    "pydantic",
+    "pyarrow",
+    "structlog",
+    "tqdm",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
 
 [project.scripts]
 varannot = "VarAnnotator.cli:main"

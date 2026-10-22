@@ -76,6 +76,18 @@ pip install -e .
 varannot --help
 ```
 
+Run the test suite after the editable install:
+
+```bash
+python -m pytest -q
+```
+
+If the package has not yet been installed into the active environment, use:
+
+```bash
+PYTHONPATH=src python -m pytest -q
+```
+
 VIPER-style prompt generation uses the following candidate filters:
 
 ```bash
@@ -88,6 +100,12 @@ varannot prompt annotated.tsv \
   --max-variant-length 1000
 ```
 
+## External resources and versioning
 
+VarAnno2LLM calls external VEP and bcftools executables. For reproducible
+results, record the VEP release and cache version, GRCh37 FASTA source,
+dbNSFP, SpliceAI, dbscSNV, ClinVar, InterVar, HGMD and OMIM snapshot dates in
+the run metadata. Archive the environment or container together with the exact
+source commit used for a publication.
 
 

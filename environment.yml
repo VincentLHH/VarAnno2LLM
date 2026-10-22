@@ -32,3 +32,5 @@ dependencies:
     - pydantic
     - structlog
     - dask[complete]
+    - humanfriendly
+    - tqdm
